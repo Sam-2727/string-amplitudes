@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "string-amplitudes"
+version = "0.1.0"
+description = "Reproducible numerical tools for string-amplitude calculations"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "networkx>=3.0",
+]
+
+[project.optional-dependencies]
+docs = [
+    "myst-parser>=2.0",
+    "pydata-sphinx-theme>=0.15",
+    "sphinx>=7.0",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
