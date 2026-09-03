@@ -8,8 +8,32 @@ version = "0.1.0"
 description = "Reproducible numerical tools for string-amplitude calculations"
 readme = "README.md"
 requires-python = ">=3.10"
+authors = [
+    { name = "Sam Christian" },
+    { name = "Ben Mazel" },
+    { name = "Yuchen Wang" },
+    { name = "Xi Yin" },
+    { name = "Yutai Zhang" },
+]
+keywords = [
+    "compact boson",
+    "Riemann surfaces",
+    "ribbon graphs",
+    "string amplitudes",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Physics",
+]
 dependencies = [
     "networkx>=3.0",
+    "numpy>=1.24",
 ]
 
 [project.optional-dependencies]
@@ -19,5 +43,18 @@ docs = [
     "sphinx>=7.0",
 ]
 
+[project.urls]
+Documentation = "https://sam-2727.github.io/string-amplitudes/"
+Issues = "https://github.com/Sam-2727/string-amplitudes/issues"
+Source = "https://github.com/Sam-2727/string-amplitudes"
+
+[tool.setuptools]
+include-package-data = false
+package-dir = { "" = "src" }
+
 [tool.setuptools.packages.find]
 where = ["src"]
+include = ["string_amplitudes*"]
+
+[tool.setuptools.package-data]
+string_amplitudes = ["py.typed"]

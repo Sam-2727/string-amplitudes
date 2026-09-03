@@ -1,19 +1,29 @@
-# String Amplitudes
+---
+html_theme.sidebar_primary.remove: true
+html_theme.sidebar_secondary.remove: true
+---
 
-This repository can be used to compute the bosonic string integrand at arbitrary genus and number of punctures. Eventually, support will be added
-for other partition functions (e.g. Liouville, superstring), and allow integration in your favorite moduli space coordinates (e.g. ribbon graph, period matrix).
-
-<div class="api-visibility-control">
-  <label class="api-visibility-switch" for="api-internals-toggle-index">
-    <input class="api-internals-toggle" type="checkbox" id="api-internals-toggle-index">
-    <span class="api-visibility-slider" aria-hidden="true"></span>
-    <span class="api-visibility-label">Show internal functions</span>
-  </label>
+<div class="landing-page">
+  <section class="landing-hero">
+    <div class="landing-logo" aria-hidden="true">
+      <img class="landing-logo-light" src="_static/images/string_amplitudes_logo.svg" alt="">
+      <img class="landing-logo-dark" src="_static/images/string_amplitudes_logo_white.svg" alt="">
+    </div>
+    <h1>String Amplitudes</h1>
+    <p class="landing-summary">Numerical tools for evaluating string amplitudes.</p>
+    <div class="landing-actions">
+      <a class="landing-action landing-action-primary" href="get_started.html">Get started</a>
+      <a class="landing-action landing-action-secondary" href="calculations.html">View calculations</a>
+      <a class="landing-action landing-action-secondary" href="api/index.html">View API</a>
+    </div>
+  </section>
 </div>
 
 ```{toctree}
-:maxdepth: 2
-:caption: API reference
+:hidden:
+:maxdepth: 1
 
-api/ribbon_graph_generator
+get_started
+Calculations <calculations>
+API <api/index>
 ```

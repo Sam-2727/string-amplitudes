@@ -9,12 +9,12 @@ document.addEventListener("DOMContentLoaded", () => {
   const visibilityRoot = document.documentElement;
 
   if (article) {
-    article.querySelectorAll("dl.py.function").forEach((definition) => {
+    article.querySelectorAll("dl.py").forEach((definition) => {
       const signature = definition.querySelector("dt.sig[id]");
       const qualifiedName = signature ? signature.id : "";
-      const functionName = qualifiedName.split(".").pop();
+      const objectName = qualifiedName.split(".").pop();
 
-      if (functionName && functionName.startsWith("_")) {
+      if (objectName && objectName.startsWith("_")) {
         definition.classList.add("api-internal-function");
       }
     });

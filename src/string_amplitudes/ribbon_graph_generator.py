@@ -12,12 +12,13 @@ The public functions are:
 * :func:`sample_ribbon_graph`: heuristically sample one ribbon graph when generating
   all topologies is impractical and/or unnecessary.
 * :func:`get_boundary_data`: from the output of :func:`generate_ribbon_graphs`,
-  give the sewing data on the face boundaries of one generated graph.
+  give the sewing data on the face boundaries of a given graph.
 """
 
 from itertools import permutations, product as iproduct
-from collections import defaultdict
+from collections import defaultdict, deque
 from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor, as_completed
+from numbers import Integral
 import random
 
 try:
@@ -54,7 +55,7 @@ def _generate_connected_cubic_graphs(
     ----------
     nv : int
         Number of vertices. The generated graphs are simple, connected, and
-        trivalent, with vertex labels ``1, ..., nv`` in the returned data.
+        trivalent.
     target_count : int or None, optional
         Stop after finding this many non-isomorphic candidates. If ``None``,
         stop after the search has found no new candidate for the configured
@@ -71,8 +72,8 @@ def _generate_connected_cubic_graphs(
     -------
     list of tuple
         A list of ``(edges, vertices)`` pairs. ``edges`` is a list of
-        ``(vertex_a, vertex_b)`` endpoint pairs, and ``vertices`` is the list
-        ``[1, ..., nv]``.
+        ``(vertex_a, vertex_b)`` endpoint pairs, and ``vertices`` contains the
+        vertex labels.
     """
     if nv in _CUBIC_GRAPH_CACHE:
         return _CUBIC_GRAPH_CACHE[nv]
@@ -120,11 +121,11 @@ def _generate_connected_cubic_graphs(
             stagnation = 0
 
     base_graphs = []
-    verts = list(range(1, nv + 1))
+    verts = list(range(nv))
     for g in reps:
         edges = []
         for a, b in sorted(g.edges()):
-            edges.append((a + 1, b + 1))
+            edges.append((int(a), int(b)))
         base_graphs.append((edges, verts))
 
     # If fast hash-only mode failed to reach the requested target, retry strictly.
@@ -376,8 +377,8 @@ def _matrix_to_multiedges(mult_mat):
     Returns
     -------
     list of tuple of int
-        Edge endpoint pairs with one-indexed vertex labels. An edge occurs once
-        in the list for each unit of its matrix multiplicity.
+        Edge endpoint pairs. An edge occurs once in the list for each unit of
+        its matrix multiplicity.
     """
     n = len(mult_mat)
     edges = []
@@ -385,7 +386,7 @@ def _matrix_to_multiedges(mult_mat):
         for j in range(i + 1, n):
             mult = mult_mat[i][j]
             for _ in range(mult):
-                edges.append((i + 1, j + 1))
+                edges.append((i, j))
     return edges
 
 
@@ -407,8 +408,8 @@ def _cubic_base_graphs(nv):
     -------
     list of tuple
         Connected, pairwise non-isomorphic multigraphs represented as
-        ``(edges, vertices)``. ``edges`` is a repeated list of one-indexed
-        endpoint pairs, and ``vertices`` is ``[1, ..., nv]``.
+        ``(edges, vertices)``. ``edges`` is a repeated list of endpoint pairs,
+        and ``vertices`` contains the vertex labels.
     """
     if nv in _CUBIC_MULTIGRAPH_CACHE:
         return _CUBIC_MULTIGRAPH_CACHE[nv]
@@ -419,11 +420,11 @@ def _cubic_base_graphs(nv):
         )
 
     if nv == 2:
-        base_graphs = [([(1, 2), (1, 2), (1, 2)], [1, 2])]
+        base_graphs = [([(0, 1), (0, 1), (0, 1)], [0, 1])]
         _CUBIC_MULTIGRAPH_CACHE[nv] = base_graphs
         return base_graphs
 
-    verts = list(range(1, nv + 1))
+    verts = list(range(nv))
     edge_match = nx.algorithms.isomorphism.categorical_edge_match("mult", 1)
     reps_by_hash = defaultdict(list)
     base_graphs = []
@@ -481,20 +482,20 @@ def _heuristic_cubic_base_graphs(nv, ne):
     if nv == 2 and ne == 3:
         # Theta graph: 2 vertices connected by 3 parallel edges. Keep this base
         # case available so genus-1 one-face generation still has a seed graph.
-        return [([(1, 2), (1, 2), (1, 2)], [1, 2])]
+        return [([(0, 1), (0, 1), (0, 1)], [0, 1])]
     if nv == 4 and ne == 6:
         # K4
-        return [([(1, 2), (1, 3), (1, 4), (2, 3), (2, 4), (3, 4)], [1, 2, 3, 4])]
+        return [([(0, 1), (0, 2), (0, 3), (1, 2), (1, 3), (2, 3)], [0, 1, 2, 3])]
     if nv == 6 and ne == 9:
         # K_{3,3}
         k33 = (
-            [(1, 4), (1, 5), (1, 6), (2, 4), (2, 5), (2, 6), (3, 4), (3, 5), (3, 6)],
-            [1, 2, 3, 4, 5, 6],
+            [(0, 3), (0, 4), (0, 5), (1, 3), (1, 4), (1, 5), (2, 3), (2, 4), (2, 5)],
+            [0, 1, 2, 3, 4, 5],
         )
         # Triangular prism
         prism = (
-            [(1, 2), (2, 3), (3, 1), (4, 5), (5, 6), (6, 4), (1, 4), (2, 5), (3, 6)],
-            [1, 2, 3, 4, 5, 6],
+            [(0, 1), (1, 2), (2, 0), (3, 4), (4, 5), (5, 3), (0, 3), (1, 4), (2, 5)],
+            [0, 1, 2, 3, 4, 5],
         )
         return [k33, prism]
     if nv >= 8 and nv % 2 == 0 and ne == (3 * nv) // 2:
@@ -1244,7 +1245,7 @@ def sample_ribbon_graph(
     tuple of tuple and dict
         The sampled ribbon graph ``(edges, vertices, rotation)`` and metadata
         recording the seed, graph trial number, graph seed, rotation trial number, and
-        cyclic orientation at each vertex. The latter isencoded as a binary string, with each bit
+        cyclic orientation at each vertex. The latter is encoded as a binary string, with each bit
         representing one of the two inequivalent cylic orientations. For a given vertex, with the smallest edge
         index first reading, if the second edge index is the second highest, then the bit is 0.
         Alternatively, if the second edge index is the highest, then the bit is 1.
@@ -1289,10 +1290,10 @@ def sample_ribbon_graph(
             continue
 
         edges = sorted(
-            (min(int(a), int(b)) + 1, max(int(a), int(b)) + 1)
+            (min(int(a), int(b)), max(int(a), int(b)))
             for a, b in graph.edges()
         )
-        vertices = list(range(1, n_vertices + 1))
+        vertices = list(range(n_vertices))
 
         for rotation_trial in range(max_rotation_trials):
             rotation, orientation_mask = _sample_random_rotation_system(
@@ -1321,86 +1322,172 @@ def sample_ribbon_graph(
 # Boundary and sewing data
 # ============================================================
 
-def get_boundary_data(ribbon_graph):
-    """For each face of a given ribbon graph, returns the edges and vertices along the boundary of the face.
+def get_boundary_data(ribbon_graph, edge_lengths=None):
+    """Return the combinatorial and (if edge lengths are provided) discretized boundary data.
 
     For the case of one face, which is the only case that has been tested, every graph edge
     occurs exactly twice across the edge of the single face, and ``sewing`` records the two locations
-    of the edges sewn together.  Edge labels, face labels, and boundary positions
-    are all one-indexed.
+    of the edges sewn together.
 
     The returned dictionary has the following structure::
 
         {
+            "genus": int,
             "n_faces": int,
-            "boundaries": tuple[tuple[(from_vertex, to_vertex, edge_label), ...], ...],
-            "edge_sequences": tuple[tuple[edge_label, ...], ...],
-            "vertex_sequences": tuple[tuple[vertex_label, ...], ...],
+            "boundaries": tuple[tuple[(from_vertex, to_vertex, edge_index), ...], ...],
+            "edge_sequences": tuple[tuple[edge_index, ...], ...],
+            "vertex_sequences": tuple[tuple[vertex_index, ...], ...],
             "sewing": {
-                edge_label: ((face_label, position), (face_label, position)),
+                edge_index: ((face_index, position), (face_index, position)),
                 ...,
             },
+            "edge_lengths": tuple[int, ...] | None,
+            "boundary_segment_starts": tuple[tuple[int, ...], ...] | None,
+            "boundary_lengths": tuple[int, ...] | None,
         }
+
+    The final three entries are ``None`` when ``edge_lengths`` is omitted.
 
     Parameters
     ----------
     ribbon_graph : tuple
         A graph ``(edges, vertices, rotation)`` returned by
         :func:`generate_ribbon_graphs`.
+    edge_lengths : sequence of int or None, optional
+        Positive integer discretization length of every graph edge, ordered by
+        edge index. When this parameter is supplied, the returned dictionary includes 
+        the starting site of every boundary segment and the length of every face boundary.
 
     Returns
     -------
     dict
-        Face boundaries, edge and vertex sequences, and the sewing map in the
-        structure specified above.
+        Genus, face boundaries, edge and vertex sequences, sewing map, and
+        optional discretized boundary geometry in the structure specified
+        above.
 
     Raises
     ------
+    TypeError
+        If a supplied edge length is not an integer.
     ValueError
-        If an edge does not occur exactly twice across all face boundaries.
+        If the graph data are inconsistent, an edge does not occur exactly
+        twice across all face boundaries, or a supplied edge length is not
+        positive.
     """
-    edges, verts, rotation = ribbon_graph
+    try:
+        edges, vertices, rotation = ribbon_graph
+    except (TypeError, ValueError) as error:
+        raise ValueError(
+            "ribbon_graph must be an (edges, vertices, rotation) tuple"
+        ) from error
+
+    vertices = tuple(vertices)
+    if vertices != tuple(range(len(vertices))):
+        raise ValueError("ribbon-graph vertex indices must be 0, ..., n_vertices - 1")
+    if not edges:
+        raise ValueError("ribbon_graph must contain at least one edge")
+
+    vertex_set = set(vertices)
+    adjacency = {vertex: set() for vertex in vertices}
+    for start, end in edges:
+        if start not in vertex_set or end not in vertex_set:
+            raise ValueError(f"edge ({start}, {end}) references an unknown vertex")
+        adjacency[start].add(end)
+        adjacency[end].add(start)
+    reached = {vertices[0]}
+    queue = deque([vertices[0]])
+    while queue:
+        vertex = queue.popleft()
+        for neighbor in sorted(adjacency[vertex]):
+            if neighbor not in reached:
+                reached.add(neighbor)
+                queue.append(neighbor)
+    if reached != vertex_set:
+        raise ValueError("ribbon_graph must be connected")
+
     raw_faces = _get_all_face_boundaries(
         edges,
         rotation,
         return_boundaries=True,
     )
+    n_faces = len(raw_faces)
+    euler_numerator = 2 - len(vertices) + len(edges) - n_faces
+    if euler_numerator < 0 or euler_numerator % 2:
+        raise ValueError("ribbon_graph does not define a nonnegative integer genus")
+    genus = euler_numerator // 2
 
     boundaries = []
     edge_sequences = []
     vertex_sequences = []
     edge_positions = defaultdict(list)
 
-    for face_idx, face in enumerate(raw_faces, start=1):
+    for face_idx, face in enumerate(raw_faces):
         boundary = []
         edge_sequence = []
         vertex_sequence = []
-        for pos_idx, (frm, to, eidx) in enumerate(face, start=1):
-            edge_label = eidx + 1
-            boundary.append((frm, to, edge_label))
-            edge_sequence.append(edge_label)
+        for pos_idx, (frm, to, edge_index) in enumerate(face):
+            boundary.append((frm, to, edge_index))
+            edge_sequence.append(edge_index)
             vertex_sequence.append(frm)
-            edge_positions[edge_label].append((face_idx, pos_idx))
+            edge_positions[edge_index].append((face_idx, pos_idx))
 
         boundaries.append(tuple(boundary))
         edge_sequences.append(tuple(edge_sequence))
         vertex_sequences.append(tuple(vertex_sequence))
 
     sewing = {}
-    for edge_label, positions in edge_positions.items():
+    for edge_index, positions in edge_positions.items():
         if len(positions) != 2:
             raise ValueError(
-                f"Expected edge {edge_label} to appear twice across face boundaries, "
+                f"Expected edge {edge_index} to appear twice across face boundaries, "
                 f"got {len(positions)} times"
             )
-        sewing[edge_label] = tuple(positions)
+        sewing[edge_index] = tuple(positions)
+
+    validated_lengths = None
+    boundary_segment_starts = None
+    boundary_lengths = None
+    if edge_lengths is not None:
+        lengths = tuple(edge_lengths)
+        if len(lengths) != len(edges):
+            raise ValueError(f"expected {len(edges)} edge lengths, got {len(lengths)}")
+        normalized_lengths = []
+        for edge_index, length in enumerate(lengths):
+            if isinstance(length, bool) or not isinstance(length, Integral):
+                raise TypeError(f"edge_lengths[{edge_index}] must be an integer")
+            length = int(length)
+            if length <= 0:
+                raise ValueError(f"edge_lengths[{edge_index}] must be positive")
+            normalized_lengths.append(length)
+        validated_lengths = tuple(normalized_lengths)
+
+        starts_by_face = []
+        lengths_by_face = []
+        for edge_sequence in edge_sequences:
+            starts = []
+            position = 0
+            for edge_index in edge_sequence:
+                starts.append(position)
+                position += validated_lengths[edge_index]
+            starts_by_face.append(tuple(starts))
+            lengths_by_face.append(position)
+        boundary_segment_starts = tuple(starts_by_face)
+        boundary_lengths = tuple(lengths_by_face)
+        if sum(boundary_lengths) != 2 * sum(validated_lengths):
+            raise ValueError(
+                "boundary lengths are inconsistent with pairwise edge sewing"
+            )
 
     return {
-        "n_faces": len(boundaries),
+        "genus": genus,
+        "n_faces": n_faces,
         "boundaries": tuple(boundaries),
         "edge_sequences": tuple(edge_sequences),
         "vertex_sequences": tuple(vertex_sequences),
         "sewing": sewing,
+        "edge_lengths": validated_lengths,
+        "boundary_segment_starts": boundary_segment_starts,
+        "boundary_lengths": boundary_lengths,
     }
 
 

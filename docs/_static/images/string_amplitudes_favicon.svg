@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg"
+     width="322" height="200"
+     viewBox="177 35 322 200"
+     role="img"
+     aria-labelledby="stringamp-favicon-title">
+  <title id="stringamp-favicon-title">String Amplitudes bracketed torus</title>
+
+  <g fill="#fff" stroke="none">
+    <g transform="translate(125 0)">
+      <path d="M443 633C458 633 483 633 483 663C483 694 459 694 443 694H262C229 694 222 685 222 653V-42C222 -73 228 -83 262 -83H443C458 -83 483 -83 483 -53C483 -22 459 -22 443 -22H291V633Z"
+            transform="translate(10.586873 205.772201) scale(0.231660232 -0.231660232)" />
+    </g>
+    <g transform="translate(-125 0)">
+      <path d="M302 653C302 684 296 694 262 694H81C66 694 41 694 41 664C41 633 65 633 81 633H233V-22H81C66 -22 41 -22 41 -52C41 -83 65 -83 81 -83H262C295 -83 302 -74 302 -42Z"
+            transform="translate(544.023166 205.772201) scale(0.231660232 -0.231660232)" />
+    </g>
+  </g>
+
+  <!-- A solid white torus surface remains legible at favicon resolution. -->
+  <g fill="none" stroke="#fff" stroke-width="59.76"
+     stroke-linejoin="round" stroke-linecap="round">
+    <ellipse cx="338" cy="135" rx="96" ry="32.834" />
+    <path d="M242 135 A96 32.834 0 0 0 434 135" />
+  </g>
+</svg>
