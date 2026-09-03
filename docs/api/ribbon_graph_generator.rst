@@ -1,4 +1,4 @@
-Generation of ribbon graphs
+Generate ribbon graphs
 ===========================
 
 .. raw:: html

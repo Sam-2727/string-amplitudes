@@ -23,16 +23,25 @@ jobs:
           python-version: ${{ matrix.python-version }}
           cache: pip
 
-      - name: Install package
-        run: python -m pip install -e .
+      - name: Build wheel
+        run: python -m pip wheel --no-deps --wheel-dir dist .
+
+      - name: Install wheel
+        run: python -m pip install dist/*.whl
+
+      - name: Check installed dependencies
+        run: python -m pip check
 
       - name: Compile package
         run: python -m compileall -q src
 
+      - name: Run unit tests
+        if: ${{ hashFiles('tests/**/*.py') != '' }}
+        run: python -m unittest discover -s tests -v
+
       - name: Verify public imports
         run: >-
-          python -c "from string_amplitudes import
-          generate_ribbon_graphs, get_boundary_data, sample_ribbon_graph;
-          assert callable(generate_ribbon_graphs);
-          assert callable(get_boundary_data);
-          assert callable(sample_ribbon_graph)"
+          python -c "import string_amplitudes as sa;
+          missing = [name for name in sa.__all__ if not hasattr(sa, name)];
+          assert not missing, missing;
+          assert sa.__version__ == '0.1.0'"

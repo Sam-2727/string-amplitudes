@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg"
+     width="494" height="220"
+     viewBox="19.169548263 25 494 220"
+     role="img"
+     aria-labelledby="stringamp-icon-title stringamp-icon-desc">
+  <title id="stringamp-icon-title">StringAmp executable-path icon</title>
+  <desc id="stringamp-icon-desc">Computer Modern Typewriter code brackets enclosing a torus projected at 70 degrees. It has a leading executable-path prefix.</desc>
+
+  <!-- Transparent background.  All visible artwork uses only black and white. -->
+  <g id="code-brackets" fill="#000" stroke="none">
+    
+    <path id="executable-period"
+          d="M325 62C325 99 295 125 263 125C225 125 200 94 200 63C200 26 230 0 262 0C300 0 325 31 325 62Z"
+          transform="translate(-2.977506 205.772201) scale(0.231660232 -0.231660232)" />
+    <path id="executable-slash"
+          d="M458 635C465 651 466 651 466 659C466 677 451 694 431 694C409 694 402 679 396 666L66 -24C59 -40 58 -40 58 -48C58 -66 73 -83 93 -83C115 -83 122 -68 128 -55Z"
+          transform="translate(68.875776 205.772201) scale(0.231660232 -0.231660232)" />
+
+    
+    <g transform="translate(125 0)">
+      <path d="M443 633C458 633 483 633 483 663C483 694 459 694 443 694H262C229 694 222 685 222 653V-42C222 -73 228 -83 262 -83H443C458 -83 483 -83 483 -53C483 -22 459 -22 443 -22H291V633Z"
+            transform="translate(10.586873 205.772201) scale(0.231660232 -0.231660232)" />
+    </g>
+    <g transform="translate(-125 0)">
+      <path d="M302 653C302 684 296 694 262 694H81C66 694 41 694 41 664C41 633 65 633 81 633H233V-22H81C66 -22 41 -22 41 -52C41 -83 65 -83 81 -83H262C295 -83 302 -74 302 -42Z"
+            transform="translate(544.023166 205.772201) scale(0.231660232 -0.231660232)" />
+    </g>
+
+  </g>
+
+  <!--
+    Direct SVG translation of the reference torus geometry:
+      R = 96, r = .28 R, projected radius = R cos(70 degrees).
+    Repainting the lower/front arc after the complete projected loop creates
+    the occlusion and swept inner lip that make the torus read in perspective.
+  -->
+  <g id="torus-surface" data-contour-width="5"
+     fill="none" stroke-linejoin="round">
+    <!-- Pass 1: complete projected tube. -->
+    <ellipse cx="338" cy="135" rx="96" ry="32.834"
+             stroke="#000" stroke-width="59.76"
+             stroke-linecap="round" />
+    <ellipse cx="338" cy="135" rx="96" ry="32.834"
+             stroke="#fff" stroke-width="49.76"
+             stroke-linecap="round" />
+
+    <!-- Pass 2: lower/front half, repainted for occlusion. -->
+    <path d="M 242 135 A 96 32.834 0 0 0 434 135"
+          stroke="#000" stroke-width="59.76" />
+    <path d="M 242 135 A 96 32.834 0 0 0 434 135"
+          stroke="#fff" stroke-width="49.76"
+          stroke-linecap="round" />
+  </g>
+
+
+</svg>
