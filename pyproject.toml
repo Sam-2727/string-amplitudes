@@ -39,6 +39,7 @@ dependencies = [
 [project.optional-dependencies]
 docs = [
     "myst-parser>=2.0",
+    "nbconvert>=7.0",
     "pydata-sphinx-theme>=0.15",
     "sphinx>=7.0",
 ]
