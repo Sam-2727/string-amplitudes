@@ -3,13 +3,13 @@ using the formula of Verlinde, Verlinde in terms of the free boson partition
 function on the ribbon graph surface.
 
 * :func:`bghost_direction_coefficients` construct the matrix converting elementary
-seam integrals to the :math:`\mathcal{B}` insertions associated with each edge length.
+  seam integrals to the :math:`\mathcal{B}` insertions associated with each edge length.
 * :func:`integrated_bghost_edge_components` integrates the holomorphic
   :math:`bc` correlator over elementary seams.
 * :func:`bghost_measure_from_edge_components` assembles the full bc ghost measure from
-integrated :`\mathcal{B}` components.
+  integrated :math:`\mathcal{B}` components.
 * :func:`bghost_measure` assembles the bc ghost correlation function using the
-Verlinde-Verlinde formula.
+  Verlinde-Verlinde formula.
 * :func:`critical_bosonic_string_integrand` multiplies the ghost measure by
   26 identical noncompact boson partition functions to compute the full critical bosonic
   string integrand.

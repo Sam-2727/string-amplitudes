@@ -4,28 +4,29 @@ The public objects are:
 
 * :class:`FreeBosonOnePointFunctions`: Store the one point functions.
 * :func:`free_boson_one_point_functions`: evaluate the correlators
-.. math::
 
-   \mathrm{holomorphic}
-   =
-   \left\langle
-   :\!\partial_z X\,\partial_z X\!:(0)
-   \right\rangle,
+  .. math::
 
-and
+     \mathrm{holomorphic}
+     =
+     \left\langle
+     :\!\partial_z X\,\partial_z X\!:(0)
+     \right\rangle,
 
-.. math::
+  and
 
-   \mathrm{mixed}
-   =
-   \left\langle
-   :\!\partial_z X\,\bar{\partial}_{\bar z}X\!:(0)
-   \right\rangle.
+  .. math::
+
+     \mathrm{mixed}
+     =
+     \left\langle
+     :\!\partial_z X\,\bar{\partial}_{\bar z}X\!:(0)
+     \right\rangle.
 
 * :func:`genus_one_period_matrix_one_point_functions`: Evaluate the corresponding flat
-space period matrix expressions.
+  space period matrix expressions.
 * :func:`genus_one_disk_frame_one_point_functions`: Transform the flat space genus one
-expression to the ribbon graph coordinates.
+  expression to the ribbon graph coordinates.
 """
 
 from __future__ import annotations

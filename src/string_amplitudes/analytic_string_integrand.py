@@ -1,13 +1,13 @@
 r"""Evaluate the analytic bosonic string integrand at genus two and three in terms of
-    the Igusa cusp forms.
-    This allows us to confirm that our numerics are correct.
+the Igusa cusp forms.
+This allows us to confirm that our numerics are correct.
 
 The public functions are:
 
 * :func:`genus_two_period_matrix_integrand`: Evaluates the genus two string integrand
-in terms of the period matrix.
+  in terms of the period matrix.
 * :func:`genus_three_period_matrix_integrand`: Evaluates the genus three string integrand
-in terms of the period matrix.
+  in terms of the period matrix.
 """
 
 from __future__ import annotations
