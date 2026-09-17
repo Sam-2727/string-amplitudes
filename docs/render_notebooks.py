@@ -18,6 +18,14 @@ PUBLISHED_NOTEBOOKS = (
         PROJECT_ROOT / "tutorials" / "compact_boson_partition_function.ipynb",
         "Compact boson partition function",
     ),
+    (
+        PROJECT_ROOT / "tutorials" / "free_boson_one_point_functions.ipynb",
+        "Free boson one-point functions",
+    ),
+    (
+        PROJECT_ROOT / "tutorials" / "critical_bosonic_string_integrand.ipynb",
+        "Critical bosonic string integrand",
+    ),
 )
 
 

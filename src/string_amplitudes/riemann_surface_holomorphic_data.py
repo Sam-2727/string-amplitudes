@@ -23,6 +23,9 @@ The public objects are:
   specified argument, period matrix, and half-characteristic.
 * :func:`riemann_theta_gradient`: evaluates the gradient of the Riemann theta
   function with respect to its argument.
+* :func:`igusa_cusp_form_genus_two` and
+  :func:`igusa_cusp_form_genus_three`: evaluate the genus two and genu -three
+  Igusa cusp forms in the conventions used in our paper.
 * :func:`prime_form`: constructs the prime form from an odd
   characteristic.
 * :func:`riemann_constant_vector`:  computes the Riemann constant.
@@ -616,6 +619,116 @@ def riemann_theta_gradient(
     )
     assert gradient is not None
     return gradient
+
+
+def igusa_cusp_form_genus_two(
+    period_matrix: Sequence[Sequence[complex]],
+    *,
+    lattice_cutoff: int | None = None,
+    tolerance: float = 1e-12,
+) -> np.complex128:
+    r"""Evaluate the genus-two Igusa cusp form in the product convention.
+
+    This function uses the convention
+
+    .. math::
+
+       \chi_{10}(\Omega)
+       =
+       \prod_{\delta\,\mathrm{even}}
+       \vartheta[\delta](0\mid\Omega)^2.
+
+    Parameters
+    ----------
+    period_matrix : sequence of sequence of complex
+        Genus-two period matrix in the Siegel upper half-space.
+    lattice_cutoff : int or None, optional
+        Cutoff for each integer component in the theta sums. If ``None``,
+        :func:`theta_truncation` chooses the cutoff.
+    tolerance : float, optional
+        Tolerance used by :func:`theta_truncation` when ``lattice_cutoff`` is
+        not supplied.
+
+    Returns
+    -------
+    numpy.complex128
+        Product-normalized value of :math:`\chi_{10}(\Omega)`.
+    """
+
+    omega = _validate_period_matrix(period_matrix)
+    if omega.shape != (2, 2):
+        raise ValueError(
+            "igusa_cusp_form_genus_two requires a period matrix of shape (2, 2)"
+        )
+    argument = np.zeros(2, dtype=np.complex128)
+    value = np.complex128(1.0)
+    for characteristic in theta_characteristics(2, parity="even"):
+        theta_constant = riemann_theta(
+            argument,
+            omega,
+            characteristic=characteristic,
+            lattice_cutoff=lattice_cutoff,
+            tolerance=tolerance,
+        )
+        value *= theta_constant**2
+    return np.complex128(value)
+
+
+def igusa_cusp_form_genus_three(
+    period_matrix: Sequence[Sequence[complex]],
+    *,
+    lattice_cutoff: int | None = None,
+    tolerance: float = 1e-12,
+) -> np.complex128:
+    r"""Evaluate the genus-three Igusa cusp form in the product convention.
+
+    This function uses the convention
+
+    .. math::
+
+       \chi_{18}(\Omega)
+       =
+       \prod_{\delta\,\mathrm{even}}
+       \vartheta[\delta](0\mid\Omega),
+
+    where the product is over the 36 even genus-three characteristics.
+
+    Parameters
+    ----------
+    period_matrix : sequence of sequence of complex
+        Genus-three period matrix in the Siegel upper half-space.
+    lattice_cutoff : int or None, optional
+        Cutoff for each integer component in the theta sums. If ``None``,
+        :func:`theta_truncation` chooses the cutoff.
+    tolerance : float, optional
+        Tolerance used by :func:`theta_truncation` when ``lattice_cutoff`` is
+        not supplied.
+
+    Returns
+    -------
+    numpy.complex128
+        Product-normalized value of :math:`\chi_{18}(\Omega)`.
+    """
+
+    omega = _validate_period_matrix(period_matrix)
+    if omega.shape != (3, 3):
+        raise ValueError(
+            "igusa_cusp_form_genus_three requires a period matrix of shape (3, 3)"
+        )
+    argument = np.zeros(3, dtype=np.complex128)
+    value = np.complex128(1.0)
+    even_characteristics = theta_characteristics(3, parity="even")
+    if len(even_characteristics) != 36:
+        raise RuntimeError("genus three must have exactly 36 even characteristics")
+    for characteristic in even_characteristics:
+        value *= riemann_theta(
+            argument,
+            omega,
+            characteristic=characteristic,
+            lattice_cutoff=lattice_cutoff,
+            tolerance=tolerance,
+        )
+    return np.complex128(value)
 
 
 def _riemann_theta_with_gradient(
@@ -1614,6 +1727,7 @@ __all__ = (
     "abel_jacobi_map",
     "bc_correlator",
     "characteristic_parity",
+    "igusa_cusp_form_genus_two",
     "prime_form",
     "prepare_bc_correlator",
     "riemann_constant_vector",

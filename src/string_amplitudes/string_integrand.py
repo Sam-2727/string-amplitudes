@@ -1,19 +1,18 @@
-r"""Construct the bosonic-string measure in one-face ribbon-graph coordinates.
+r"""Construct the bosonic string integrand in ribbon graph coordinates
+using the formula of Verlinde, Verlinde in terms of the free boson partition
+function on the ribbon graph surface.
 
-The implementation is restricted to the fixed-perimeter cells of
-:math:`\mathcal M_{g,1}` used in the current draft.  It separates three
-operations that have distinct mathematical roles:
-
-* :func:`bghost_direction_coefficients` constructs the pullback of the
-  elementary seam insertions to independent edge-length coordinates.
+* :func:`bghost_direction_coefficients` construct the matrix converting elementary
+seam integrals to the :math:`\mathcal{B}` insertions associated with each edge length.
 * :func:`integrated_bghost_edge_components` integrates the holomorphic
   :math:`bc` correlator over elementary seams.
-* :func:`bghost_measure_from_edge_components` performs the alternating
-  holomorphic--antiholomorphic wedge product.
-* :func:`bghost_measure` combines those operations for the Verlinde--Verlinde
-  correlator.
+* :func:`bghost_measure_from_edge_components` assembles the full bc ghost measure from
+integrated :`\mathcal{B}` components.
+* :func:`bghost_measure` assembles the bc ghost correlation function using the
+Verlinde-Verlinde formula.
 * :func:`critical_bosonic_string_integrand` multiplies the ghost measure by
-  26 identical noncompact boson partition functions.
+  26 identical noncompact boson partition functions to compute the full critical bosonic
+  string integrand.
 
 The direct quadrature is the transparent reference implementation.  Its work
 grows as ``binomial(6*g - 3, 3*g - 2) * quadrature_order**(3*g - 2)``;
@@ -821,8 +820,6 @@ def critical_bosonic_string_integrand(
             "the string integrand is outside the float64 range"
         )
     return float(math.exp(log_density))
-
-
 __all__ = (
     "bghost_direction_coefficients",
     "bghost_measure",

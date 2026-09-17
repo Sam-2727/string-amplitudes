@@ -6,7 +6,4 @@ __pycache__/
 build/
 dist/
 docs/_build/
-*.ipynb
-!tutorials/compact_boson_partition_function.ipynb
-!tutorials/ribbon_graph_generation.ipynb
 tests/
